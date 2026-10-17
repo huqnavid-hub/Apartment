@@ -188,13 +188,11 @@
     let appData = { kitchen: [], alcohol: [], recipes: [] };
     let currentView = 'kitchen';
 
-    // Fast, proven CSV parser from the original working build
     function parseCSV(text) {
       if (!text) return [];
       const lines = text.trim().replace(/^\uFEFF/, '').split(/\r?\n/);
       if (lines.length < 2) return [];
       
-      // Extract headers from first row
       const headers = [];
       let hCur = '', hInside = false;
       for (let i = 0; i < lines[0].length; i++) {
@@ -226,10 +224,14 @@
 
     async function fetchInventory() {
       try {
+        // Appends a unique timestamp to force Safari to always fetch fresh data without caching
+        const antiCache = '&_ts=' + Date.now();
+        const fetchOpts = { cache: 'no-store' };
+
         const [kitchenRes, alcoholRes, recipeRes] = await Promise.all([
-          fetch(KITCHEN_CSV_URL).catch(() => null),
-          fetch(ALCOHOL_CSV_URL).catch(() => null),
-          fetch(RECIPE_CSV_URL).catch(() => null)
+          fetch(KITCHEN_CSV_URL + antiCache, fetchOpts).catch(() => null),
+          fetch(ALCOHOL_CSV_URL + antiCache, fetchOpts).catch(() => null),
+          fetch(RECIPE_CSV_URL + antiCache, fetchOpts).catch(() => null)
         ]);
         
         if (kitchenRes && kitchenRes.ok) appData.kitchen = parseCSV(await kitchenRes.text());
@@ -293,8 +295,8 @@
                 <div class="badge ${loc.toLowerCase().includes('open') ? 'active' : ''}">${loc}</div>
               </div>
               <div class="card-meta">
-                <strong>${cat}</strong>${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${qty}</strong>${pkg ? '(' + pkg + ')' : ''}
+                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${qty}</strong> ${pkg ? '(' + pkg + ')' : ''}
               </div>
               ${notes ? `<div class="card-notes">${notes}</div>` : ''}
             </div>
@@ -317,8 +319,8 @@
                 <div class="badge ${status.toLowerCase() === 'open' ? 'active' : ''}">${status}</div>
               </div>
               <div class="card-meta">
-                <strong>${cat}</strong>${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${count}</strong>${vol ? '(' + vol + ')' : ''}
+                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${count}</strong> ${vol ? '(' + vol + ')' : ''}
               </div>
               ${notes ? `<div class="card-notes">${notes}</div>` : ''}
             </div>
@@ -339,3 +341,202 @@
           return `
             <div class="card">
               <div class="card-header">
+                <div>
+                  <div class="card-title">${titleEn}</div>
+                  ${titleBn ? `<div class="card-subtitle">${titleBn}</div>` : ''}
+                </div>
+                ${time ? `<div class="badge highlight">${time}</div>` : ''}
+              </div>
+              <div class="card-meta">
+                <strong>${cuisine}</strong> ${cat ? '&bull; ' + cat : ''}
+              </div>
+              ${ingEn ? `
+                <div class="card-notes">
+                  <strong>Ingredients:</strong> ${ingEn}${ingBn ? `<div class="card-notes-bn">উপকরণ: ${ingBn}</div>` : ''}
+                </div>` : ''
+              }
+              ${instEn ? `
+                <div class="card-notes" style="margin-top:0.5rem;">
+                  <strong>Steps:</strong> ${instEn}${instBn ? `<div class="card-notes-bn">প্রস্তুত প্রণালী: ${instBn}</div>` : ''}
+                </div>` : ''
+              }
+            </div>
+          `;
+        }).join('');
+      }
+
+      grid.innerHTML = html;
+    }
+
+    /* Modal Form */
+    function openAddModal() {
+      document.getElementById('entryType').value = currentView;
+      switchFormFields();
+      document.getElementById('addModal').classList.add('open');
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').classList.remove('open');
+      document.getElementById('addEntryForm').reset();
+    }
+
+    function switchFormFields() {
+      const type = document.getElementById('entryType').value;
+      const container = document.getElementById('dynamicFields');
+      
+      if (type === 'kitchen') {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" name="itemName" required placeholder="e.g., Sumac, Black Lime Powder">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Spices, Pantry, Sauces">
+            </div>
+            <div class="form-group">
+              <label>Sub Category</label>
+              <input type="text" name="subcategory" placeholder="e.g., Whole Spices, Pastes">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" name="location" placeholder="e.g., Pantry Shelf 2, Fridge">
+            </div>
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="text" name="quantity" placeholder="e.g., 2">
+            </div>
+            <div class="form-group">
+              <label>Packaging</label>
+              <input type="text" name="packaging" placeholder="e.g., Jar, 500g Bag">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" rows="2" placeholder="Brand, expiry date, notes"></textarea>
+          </div>
+        `;
+      } 
+      else if (type === 'alcohol') {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Brand / Item Name</label>
+            <input type="text" name="itemName" required placeholder="e.g., Don Julio 1942, Macallan 12">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Tequila, Single Malt, Gin">
+            </div>
+            <div class="form-group">
+              <label>Sub Category</label>
+              <input type="text" name="subcategory" placeholder="e.g., Añejo, Speyside, London Dry">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bottle Count</label>
+              <input type="text" name="quantity" placeholder="e.g., 1">
+            </div>
+            <div class="form-group">
+              <label>Volume / Packaging</label>
+              <input type="text" name="packaging" placeholder="e.g., 750ml, 1L Box">
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select name="status">
+                <option value="Sealed">Sealed</option>
+                <option value="Open">Open</option>
+                <option value="Reserve">Reserve</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tasting Notes & Style</label>
+            <textarea name="notes" rows="2" placeholder="Flavor profile, proof, notes"></textarea>
+          </div>
+        `;
+      } 
+      else if (type === 'recipes') {
+        container.innerHTML = `
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title (English)</label>
+              <input type="text" name="titleEn" required placeholder="e.g., Charred Tomato & Pepper Ezme">
+            </div>
+            <div class="form-group">
+              <label>Title (বাংলা)</label>
+              <input type="text" name="titleBn" placeholder="e.g., এজমে সালাদ">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cuisine Type</label>
+              <input type="text" name="cuisine" placeholder="e.g., Turkish, Middle Eastern, Mexican">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Dip, BBQ, Main, Cocktail">
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="text" name="time" placeholder="e.g., 20 mins">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Key Ingredients (English)</label>
+            <textarea name="ingredientsEn" rows="2" placeholder="Tomatoes, Pepper paste, Pomegranate molasses, Parsley"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Key Ingredients (বাংলা)</label>
+            <textarea name="ingredientsBn" rows="2" placeholder="টমেটো, পেপার পেস্ট, আনারের রস, ধনেপাতা"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Instructions (English)</label>
+            <textarea name="instructionsEn" rows="3" placeholder="Finely mince vegetables, whisk dressing, mix and chill."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Instructions (বাংলা)</label>
+            <textarea name="instructionsBn" rows="3" placeholder="সব উপকরণ কুচি করে কেটে ড্রেসিং মিশিয়ে পরিবেশন করুন।"></textarea>
+          </div>
+        `;
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btnSubmit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      const formData = new FormData(e.target);
+      const payload = { type: document.getElementById('entryType').value };
+      formData.forEach((value, key) => { payload[key] = value; });
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("Item saved successfully to your Google Sheet! Please allow 1-2 minutes for Google's public CSV cache to refresh on the site.");
+        closeAddModal();
+        fetchInventory();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to submit item: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save to Database';
+      }
+    }
+
+    fetchInventory();
+  </script>
+</body>
+</html>
