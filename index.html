@@ -8,11 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16; --surface: #131c2e; --surface-card: #182238; --surface-hover: #22304e;
-      --border: #263554; --border-subtle: #1e2b45;
-      --text: #f8fafc; --text-muted: #94a3b8; --text-dim: #64748b;
-      --accent: #10b981; --accent-glow: rgba(16, 185, 129, 0.15);
-      --sidebar-width: 270px;
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #334155; --border: #334155;
+      --text: #f8fafc; --text-muted: #94a3b8; --accent: #10b981; --accent-glow: rgba(16, 185, 129, 0.2);
+      --sidebar-width: 260px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
@@ -22,118 +20,94 @@
       width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border);
       display: flex; flex-direction: column; padding: 1.5rem 1rem; transition: transform 0.3s ease; z-index: 20;
     }
-    .brand { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 2rem; padding: 0.25rem 0.5rem; line-height: 1.2; }
+    .brand { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 2rem; padding-left: 0.5rem; line-height: 1.2; }
     .brand span { color: var(--accent); display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
     .nav-section { margin-bottom: 1.5rem; }
-    .nav-header { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 0.5rem; padding-left: 0.5rem; }
+    .nav-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; margin-bottom: 0.5rem; padding-left: 0.5rem; }
     .nav-btn {
-      width: 100%; text-align: left; background: transparent; border: none; color: var(--text-muted);
-      padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; margin-bottom: 0.35rem;
+      width: 100%; text-align: left; background: transparent; border: none; color: var(--text);
+      padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s; margin-bottom: 0.25rem;
     }
-    .nav-btn:hover { background: var(--surface-hover); color: var(--text); }
+    .nav-btn:hover { background: var(--surface-hover); }
     .nav-btn.active { background: var(--accent-glow); color: var(--accent); border-left: 3px solid var(--accent); }
-    .nav-count { font-size: 0.75rem; background: var(--border); padding: 2px 7px; border-radius: 99px; color: var(--text-muted); }
-    .nav-btn.active .nav-count { background: var(--accent); color: #090d16; font-weight: 700; }
 
     .btn-add-vault {
-      margin-top: auto; background: var(--accent); color: #090d16; border: none; font-weight: 700;
-      padding: 0.85rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      font-size: 0.95rem; transition: transform 0.15s, opacity 0.15s;
+      margin-top: auto; background: var(--accent); color: #0f172a; border: none; font-weight: 700;
+      padding: 0.85rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font-size: 0.95rem; transition: opacity 0.2s;
     }
-    .btn-add-vault:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-add-vault:hover { opacity: 0.9; }
 
     /* Main Content */
-    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     
     /* Top Bar */
     .topbar {
-      height: 72px; background: var(--surface); border-bottom: 1px solid var(--border);
+      height: 70px; background: var(--surface); border-bottom: 1px solid var(--border);
       display: flex; align-items: center; padding: 0 2rem; gap: 1rem;
     }
     .menu-toggle { display: none; background: transparent; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
-    .search-container { flex: 1; max-width: 650px; position: relative; }
+    .search-container { flex: 1; max-width: 600px; position: relative; }
     .search-container input {
-      width: 100%; padding: 0.8rem 1rem 0.8rem 2.75rem; border-radius: 99px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 0.95rem; outline: none; transition: all 0.2s;
+      width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: 99px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 0.95rem; outline: none; transition: border-color 0.2s;
     }
     .search-container input:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
-
+    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    
     /* Workspace */
     .workspace { flex: 1; padding: 2rem; overflow-y: auto; }
-    .page-header { margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
-    .page-title { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+    .page-header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; }
+    .page-title { font-size: 1.8rem; font-weight: 700; }
     .page-stats { font-size: 0.9rem; color: var(--text-muted); }
-
-    /* Filter Chips */
-    .chips-bar { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 1.25rem; scrollbar-width: none; }
-    .chips-bar::-webkit-scrollbar { display: none; }
-    .chip {
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
-      padding: 0.4rem 0.85rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s;
-    }
-    .chip:hover { border-color: var(--accent); color: var(--text); }
-    .chip.active { background: var(--accent); border-color: var(--accent); color: #090d16; }
-
-    /* Grid & Cards */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.25rem; }
-    .card {
-      background: var(--surface-card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 1.35rem; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s;
-    }
-    .card:hover { transform: translateY(-2px); border-color: #3b4d75; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
-    .card-title { font-weight: 700; font-size: 1.1rem; color: #fff; line-height: 1.3; }
-    .card-subtitle { font-size: 0.9rem; color: #34d399; margin-top: 3px; font-weight: 500; }
     
-    .badge {
-      font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 6px;
-      text-transform: uppercase; white-space: nowrap; background: var(--border); color: var(--text-muted); letter-spacing: 0.04em;
-    }
-    .badge.active { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-    .badge.highlight { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(16, 185, 129, 0.3); }
+    /* Cards Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; }
+    .card-title { font-weight: 600; font-size: 1.05rem; color: #fff; line-height: 1.3; }
+    .card-subtitle { font-size: 0.85rem; color: #34d399; margin-top: 2px; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 6px; text-transform: uppercase; white-space: nowrap; background: var(--surface-hover); color: var(--text-muted); }
+    .badge.active { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .badge.highlight { background: var(--accent-glow); color: var(--accent); }
+    .card-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .card-meta strong { color: #e2e8f0; }
+    .card-notes { font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: auto; line-height: 1.4; }
+    .card-notes-bn { font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.4; }
     
-    .card-meta { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.45; }
-    .card-meta strong { color: #f1f5f9; }
-    .card-notes {
-      font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid var(--border-subtle);
-      padding-top: 0.85rem; margin-top: auto; line-height: 1.45; white-space: pre-line;
-    }
-    .card-notes-bn { font-size: 0.82rem; color: #94a3b8; margin-top: 0.45rem; line-height: 1.4; white-space: pre-line; }
-
-    .empty-state { text-align: center; padding: 5rem 1rem; color: var(--text-muted); grid-column: 1 / -1; font-size: 1.05rem; }
+    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
 
     /* Modal Form */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
-      display: none; align-items: center; justify-content: center; z-index: 100; padding: 1.25rem;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
     }
     .modal-overlay.open { display: flex; }
     .modal-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-      width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative;
     }
-    .modal-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
-    .form-group { margin-bottom: 1.1rem; }
+    .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
     .form-row { display: flex; gap: 1rem; }
     .form-row .form-group { flex: 1; }
-    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.45rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
     .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 0.75rem 0.95rem; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+      width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 0.9rem; outline: none;
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.75rem; }
-    .btn-secondary { background: var(--surface-hover); color: var(--text); border: none; padding: 0.75rem 1.35rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .btn-primary { background: var(--accent); color: #090d16; font-weight: 700; border: none; padding: 0.75rem 1.6rem; border-radius: 8px; cursor: pointer; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn-secondary { background: var(--surface-hover); color: var(--text); border: none; padding: 0.7rem 1.25rem; border-radius: 8px; cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #0f172a; font-weight: 700; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; }
 
     @media (max-width: 768px) {
-      .sidebar { position: absolute; left: -270px; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.7); }
-      .sidebar.open { transform: translateX(270px); }
+      .sidebar { position: absolute; left: -260px; height: 100%; box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
+      .sidebar.open { transform: translateX(260px); }
       .menu-toggle { display: block; }
       .topbar { padding: 0 1rem; }
-      .workspace { padding: 1.25rem 1rem; }
+      .workspace { padding: 1.5rem 1rem; }
       .form-row { flex-direction: column; gap: 0; }
     }
   </style>
@@ -149,22 +123,13 @@
     
     <div class="nav-section">
       <div class="nav-header">Inventory</div>
-      <button class="nav-btn active" onclick="navigate('kitchen', event)">
-        <span>🥫 Kitchen & Pantry</span>
-        <span class="nav-count" id="count-kitchen">0</span>
-      </button>
-      <button class="nav-btn" onclick="navigate('alcohol', event)">
-        <span>🥃 Master Alcohol</span>
-        <span class="nav-count" id="count-alcohol">0</span>
-      </button>
+      <button class="nav-btn active" onclick="navigate('kitchen', event)">🥫 Kitchen & Pantry</button>
+      <button class="nav-btn" onclick="navigate('alcohol', event)">🥃 Master Alcohol</button>
     </div>
     
     <div class="nav-section">
       <div class="nav-header">Culinary</div>
-      <button class="nav-btn" onclick="navigate('recipes', event)">
-        <span>📖 Master Recipes</span>
-        <span class="nav-count" id="count-recipes">0</span>
-      </button>
+      <button class="nav-btn" onclick="navigate('recipes', event)">📖 Master Recipes</button>
     </div>
 
     <button class="btn-add-vault" onclick="openAddModal()">＋ Add Entry</button>
@@ -182,13 +147,9 @@
 
     <main class="workspace">
       <div class="page-header">
-        <div>
-          <h1 class="page-title" id="pageTitle">Kitchen & Pantry</h1>
-          <div class="page-stats" id="pageStats">Loading data...</div>
-        </div>
+        <h1 class="page-title" id="pageTitle">Kitchen & Pantry</h1>
+        <div class="page-stats" id="pageStats">Loading data...</div>
       </div>
-
-      <div class="chips-bar" id="categoryChips"></div>
       <div class="grid" id="mainGrid"></div>
     </main>
   </div>
@@ -196,7 +157,7 @@
   <!-- Add Entry Modal -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-card">
-      <h2 class="modal-title" id="modalHeading">Add New Entry</h2>
+      <h2 class="modal-title">Add New Entry</h2>
       <form id="addEntryForm" onsubmit="handleFormSubmit(event)">
         <div class="form-group">
           <label>Target Database</label>
@@ -226,149 +187,66 @@
 
     let appData = { kitchen: [], alcohol: [], recipes: [] };
     let currentView = 'kitchen';
-    let activeFilter = 'ALL';
 
-    // Universal CSV line-to-array parser
-    function parseCSVLine(line) {
-      const row = [];
-      let cell = '';
-      let insideQuote = false;
-      for (let i = 0; i < line.length; i++) {
-        const c = line[i];
-        if (insideQuote) {
-          if (c === '"') {
-            if (i + 1 < line.length && line[i + 1] === '"') {
-              cell += '"';
-              i++;
-            } else {
-              insideQuote = false;
-            }
-          } else {
-            cell += c;
-          }
-        } else {
-          if (c === '"') {
-            insideQuote = true;
-          } else if (c === ',') {
-            row.push(cell.trim());
-            cell = '';
-          } else {
-            cell += c;
-          }
-        }
-      }
-      row.push(cell.trim());
-      return row;
-    }
-
-    // Handles multi-line quotes safely
-    function parseRawCSV(text) {
+    // Fast, proven CSV parser from the original working build
+    function parseCSV(text) {
       if (!text) return [];
-      const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/);
-      const rows = [];
-      let temp = '';
-      let insideQuote = false;
-
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const quoteCount = (line.match(/"/g) || []).length;
-        if (!insideQuote && quoteCount % 2 === 0) {
-          rows.push(parseCSVLine(line));
-        } else {
-          temp += (temp ? '\n' : '') + line;
-          const totalQuotes = (temp.match(/"/g) || []).length;
-          if (totalQuotes % 2 === 0) {
-            rows.push(parseCSVLine(temp));
-            temp = '';
-            insideQuote = false;
-          } else {
-            insideQuote = true;
-          }
-        }
+      const lines = text.trim().replace(/^\uFEFF/, '').split(/\r?\n/);
+      if (lines.length < 2) return [];
+      
+      // Extract headers from first row
+      const headers = [];
+      let hCur = '', hInside = false;
+      for (let i = 0; i < lines[0].length; i++) {
+        const char = lines[0][i];
+        if (char === '"') { hInside = !hInside; }
+        else if (char === ',' && !hInside) { headers.push(hCur.trim().replace(/^"|"$/g, '')); hCur = ''; }
+        else { hCur += char; }
       }
+      headers.push(hCur.trim().replace(/^"|"$/g, ''));
 
-      // Filter out completely blank lines
-      const cleanRows = rows.filter(r => r.some(c => c && c.length > 0));
-      if (cleanRows.length < 2) return [];
-
-      // Find the row that contains actual headers
-      let hIdx = 0;
-      for (let i = 0; i < Math.min(cleanRows.length, 5); i++) {
-        const rowStr = cleanRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('title') || rowStr.includes('item') || rowStr.includes('category') || rowStr.includes('location') || rowStr.includes('brand')) {
-          hIdx = i;
-          break;
+      return lines.slice(1).map(line => {
+        const values = [];
+        let cur = '', insideQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i], next = line[i+1];
+          if (char === '"' && insideQuotes && next === '"') { cur += '"'; i++; }
+          else if (char === '"') { insideQuotes = !insideQuotes; }
+          else if (char === ',' && !insideQuotes) { values.push(cur.trim()); cur = ''; }
+          else { cur += char; }
         }
-      }
-
-      const headers = cleanRows[hIdx].map(h => h.replace(/^["']|["']$/g, '').trim());
-      return cleanRows.slice(hIdx + 1).map(r => {
-        const obj = { _rawRow: r };
+        values.push(cur.trim());
+        const rowObj = { _vals: values };
         headers.forEach((h, idx) => {
-          if (h) obj[h] = (r[idx] !== undefined ? r[idx] : '').replace(/^["']|["']$/g, '').trim();
+          if (h) rowObj[h] = (values[idx] || '').replace(/^"|"$/g, '');
         });
-        return obj;
+        return rowObj;
       });
     }
 
-    // Safe accessor: looks for matching keys or falls back to column indexes
-    function getVal(item, keys, fallbackColIndex) {
-      if (!item) return '';
-      const norm = str => String(str).toLowerCase().replace(/[^a-z0-9]/g, '');
-      const itemKeys = Object.keys(item).filter(k => k !== '_rawRow');
-
-      for (const k of keys) {
-        const target = norm(k);
-        for (const ik of itemKeys) {
-          if (norm(ik) === target || norm(ik).includes(target)) {
-            if (item[ik]) return String(item[ik]).trim();
-          }
-        }
-      }
-
-      // Column position fallback if headers were slightly renamed
-      if (fallbackColIndex !== undefined && item._rawRow && item._rawRow[fallbackColIndex]) {
-        return String(item._rawRow[fallbackColIndex]).replace(/^["']|["']$/g, '').trim();
-      }
-      return '';
-    }
-
     async function fetchInventory() {
-      async function loadOne(url) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) return [];
-          const txt = await res.text();
-          return parseRawCSV(txt);
-        } catch (e) {
-          console.warn("Error fetching:", url, e);
-          return [];
-        }
+      try {
+        const [kitchenRes, alcoholRes, recipeRes] = await Promise.all([
+          fetch(KITCHEN_CSV_URL).catch(() => null),
+          fetch(ALCOHOL_CSV_URL).catch(() => null),
+          fetch(RECIPE_CSV_URL).catch(() => null)
+        ]);
+        
+        if (kitchenRes && kitchenRes.ok) appData.kitchen = parseCSV(await kitchenRes.text());
+        if (alcoholRes && alcoholRes.ok) appData.alcohol = parseCSV(await alcoholRes.text());
+        if (recipeRes && recipeRes.ok) appData.recipes = parseCSV(await recipeRes.text());
+        
+        render();
+      } catch (error) {
+        console.error("Data fetch error:", error);
+        document.getElementById('mainGrid').innerHTML = `<p class="empty-state">Unable to load live data.</p>`;
       }
-
-      const [kitchen, alcohol, recipes] = await Promise.all([
-        loadOne(KITCHEN_CSV_URL),
-        loadOne(ALCOHOL_CSV_URL),
-        loadOne(RECIPE_CSV_URL)
-      ]);
-
-      appData.kitchen = kitchen;
-      appData.alcohol = alcohol;
-      appData.recipes = recipes;
-
-      document.getElementById('count-kitchen').textContent = appData.kitchen.length;
-      document.getElementById('count-alcohol').textContent = appData.alcohol.length;
-      document.getElementById('count-recipes').textContent = appData.recipes.length;
-
-      renderChips();
-      render();
     }
 
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
     
     function navigate(view, event) {
       currentView = view;
-      activeFilter = 'ALL';
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
       if (event && event.currentTarget) event.currentTarget.classList.add('active');
       document.getElementById('sidebar').classList.remove('open');
@@ -376,36 +254,6 @@
       const titles = { kitchen: "Kitchen & Pantry", alcohol: "Master Alcohol", recipes: "Master Recipes" };
       document.getElementById('pageTitle').textContent = titles[view] || 'Inventory';
       document.getElementById('globalSearch').value = '';
-      
-      renderChips();
-      render();
-    }
-
-    function renderChips() {
-      const container = document.getElementById('categoryChips');
-      const data = appData[currentView] || [];
-      const categories = new Set();
-
-      data.forEach(item => {
-        const cat = getVal(item, ['Category', 'Cuisine Type', 'Cuisine'], 1);
-        if (cat) categories.add(cat);
-      });
-
-      if (categories.size === 0) {
-        container.innerHTML = '';
-        return;
-      }
-
-      let html = `<div class="chip ${activeFilter === 'ALL' ? 'active' : ''}" onclick="setFilter('ALL')">All Items</div>`;
-      Array.from(categories).sort().forEach(cat => {
-        html += `<div class="chip ${activeFilter === cat ? 'active' : ''}" onclick="setFilter('${cat.replace(/'/g, "\\'")}')">${cat}</div>`;
-      });
-      container.innerHTML = html;
-    }
-
-    function setFilter(cat) {
-      activeFilter = cat;
-      renderChips();
       render();
     }
 
@@ -419,10 +267,7 @@
       
       const data = appData[currentView] || [];
       const filtered = data.filter(item => {
-        const itemCat = getVal(item, ['Category', 'Cuisine Type', 'Cuisine'], 1);
-        const matchesFilter = (activeFilter === 'ALL') || (itemCat === activeFilter);
-        const allText = Object.values(item).join(' ').toLowerCase();
-        return matchesFilter && allText.includes(query);
+        return Object.values(item).join(' ').toLowerCase().includes(query);
       });
 
       stats.textContent = `${filtered.length} items found`;
@@ -434,13 +279,13 @@
 
       if (currentView === 'kitchen') {
         html = filtered.map(item => {
-          const name = getVal(item, ['ItemName', 'Item Name', 'Item'], 3) || 'Unnamed Item';
-          const loc = getVal(item, ['Location'], 0) || 'Pantry';
-          const cat = getVal(item, ['Category'], 1);
-          const sub = getVal(item, ['SubCategory', 'Sub-Category'], 2);
-          const qty = getVal(item, ['Quantity'], 4) || '-';
-          const pkg = getVal(item, ['Packaging'], 5);
-          const notes = getVal(item, ['Notes'], 6);
+          const name = item.ItemName || item['Item Name'] || (item._vals && item._vals[3]) || 'Unnamed Item';
+          const loc = item.Location || (item._vals && item._vals[0]) || 'Stock';
+          const cat = item.Category || (item._vals && item._vals[1]) || '';
+          const sub = item.SubCategory || item['Sub-Category'] || (item._vals && item._vals[2]) || '';
+          const qty = item.Quantity || (item._vals && item._vals[4]) || '-';
+          const pkg = item.Packaging || (item._vals && item._vals[5]) || '';
+          const notes = item.Notes || (item._vals && item._vals[6]) || '';
           return `
             <div class="card">
               <div class="card-header">
@@ -448,8 +293,8 @@
                 <div class="badge ${loc.toLowerCase().includes('open') ? 'active' : ''}">${loc}</div>
               </div>
               <div class="card-meta">
-                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${qty}</strong> ${pkg ? '(' + pkg + ')' : ''}
+                <strong>${cat}</strong>${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${qty}</strong>${pkg ? '(' + pkg + ')' : ''}
               </div>
               ${notes ? `<div class="card-notes">${notes}</div>` : ''}
             </div>
@@ -458,13 +303,13 @@
       } 
       else if (currentView === 'alcohol') {
         html = filtered.map(item => {
-          const name = getVal(item, ['Brand / Item Name', 'Brand', 'ItemName', 'Item Name'], 0) || 'Unnamed Bottle';
-          const status = getVal(item, ['Status'], 5) || 'Sealed';
-          const cat = getVal(item, ['Category'], 1);
-          const sub = getVal(item, ['SubCategory', 'Sub-Category'], 2);
-          const count = getVal(item, ['Bottle Count', 'Quantity'], 3) || '-';
-          const vol = getVal(item, ['Volume / Packaging', 'Packaging'], 4);
-          const notes = getVal(item, ['Tasting Notes & Style', 'Notes'], 6);
+          const name = item['Brand / Item Name'] || item.ItemName || (item._vals && item._vals[0]) || 'Unnamed Bottle';
+          const status = item.Status || (item._vals && item._vals[5]) || 'Sealed';
+          const cat = item.Category || (item._vals && item._vals[1]) || '';
+          const sub = item.SubCategory || (item._vals && item._vals[2]) || '';
+          const count = item['Bottle Count'] || item.Quantity || (item._vals && item._vals[3]) || '-';
+          const vol = item['Volume / Packaging'] || item.Packaging || (item._vals && item._vals[4]) || '';
+          const notes = item['Tasting Notes & Style'] || item.Notes || (item._vals && item._vals[6]) || '';
           return `
             <div class="card">
               <div class="card-header">
@@ -472,8 +317,8 @@
                 <div class="badge ${status.toLowerCase() === 'open' ? 'active' : ''}">${status}</div>
               </div>
               <div class="card-meta">
-                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${count}</strong> ${vol ? '(' + vol + ')' : ''}
+                <strong>${cat}</strong>${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${count}</strong>${vol ? '(' + vol + ')' : ''}
               </div>
               ${notes ? `<div class="card-notes">${notes}</div>` : ''}
             </div>
@@ -482,214 +327,15 @@
       }
       else if (currentView === 'recipes') {
         html = filtered.map(item => {
-          const titleEn = getVal(item, ['Title (English)', 'Title', 'Recipe'], 0) || 'Untitled Recipe';
-          const titleBn = getVal(item, ['Title (বাংলা)', 'Title Bangla'], 1);
-          const cuisine = getVal(item, ['Cuisine Type', 'Cuisine'], 2);
-          const cat = getVal(item, ['Category'], 3);
-          const ingEn = getVal(item, ['Key Ingredients (English)', 'Key Ingredients', 'Ingredients'], 4);
-          const ingBn = getVal(item, ['Key Ingredients (বাংলা)'], 5);
-          const time = getVal(item, ['Time', 'Cook Time'], 6);
-          const instEn = getVal(item, ['Instructions (English)', 'Instructions', 'Steps'], 7);
-          const instBn = getVal(item, ['Instructions (বাংলা)'], 8);
+          const titleEn = item['Title (English)'] || item.Title || (item._vals && item._vals[0]) || 'Recipe';
+          const titleBn = item['Title (বাংলা)'] || (item._vals && item._vals[1]) || '';
+          const cuisine = item['Cuisine Type'] || (item._vals && item._vals[2]) || '';
+          const cat = item.Category || (item._vals && item._vals[3]) || '';
+          const ingEn = item['Key Ingredients (English)'] || item['Key Ingredients'] || item.Ingredients || (item._vals && item._vals[4]) || '';
+          const ingBn = item['Key Ingredients (বাংলা)'] || (item._vals && item._vals[5]) || '';
+          const time = item.Time || (item._vals && item._vals[6]) || '';
+          const instEn = item['Instructions (English)'] || item.Instructions || item.Steps || (item._vals && item._vals[7]) || '';
+          const instBn = item['Instructions (বাংলা)'] || (item._vals && item._vals[8]) || '';
           return `
             <div class="card">
               <div class="card-header">
-                <div>
-                  <div class="card-title">${titleEn}</div>
-                  ${titleBn ? `<div class="card-subtitle">${titleBn}</div>` : ''}
-                </div>
-                ${time ? `<div class="badge highlight">${time}</div>` : ''}
-              </div>
-              <div class="card-meta">
-                <strong>${cuisine}</strong> ${cat ? '&bull; ' + cat : ''}
-              </div>
-              ${ingEn ? `
-                <div class="card-notes">
-                  <strong>Ingredients:</strong> ${ingEn}${ingBn ? `<div class="card-notes-bn">উপকরণ: ${ingBn}</div>` : ''}
-                </div>` : ''
-              }
-              ${instEn ? `
-                <div class="card-notes" style="margin-top:0.6rem;">
-                  <strong>Steps:</strong> ${instEn}${instBn ? `<div class="card-notes-bn">প্রস্তুত প্রণালী: ${instBn}</div>` : ''}
-                </div>` : ''
-              }
-            </div>
-          `;
-        }).join('');
-      }
-
-      grid.innerHTML = html;
-    }
-
-    /* Modal Form */
-    function openAddModal() {
-      document.getElementById('entryType').value = currentView;
-      switchFormFields();
-      document.getElementById('addModal').classList.add('open');
-    }
-
-    function closeAddModal() {
-      document.getElementById('addModal').classList.remove('open');
-      document.getElementById('addEntryForm').reset();
-    }
-
-    function switchFormFields() {
-      const type = document.getElementById('entryType').value;
-      const container = document.getElementById('dynamicFields');
-      
-      if (type === 'kitchen') {
-        container.innerHTML = `
-          <div class="form-group">
-            <label>Item Name</label>
-            <input type="text" name="itemName" required placeholder="e.g., Sumac, Black Lime Powder">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Spices, Pantry, Sauces">
-            </div>
-            <div class="form-group">
-              <label>Sub Category</label>
-              <input type="text" name="subcategory" placeholder="e.g., Whole Spices, Pastes">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Location</label>
-              <input type="text" name="location" placeholder="e.g., Pantry Shelf 2, Fridge">
-            </div>
-            <div class="form-group">
-              <label>Quantity</label>
-              <input type="text" name="quantity" placeholder="e.g., 2">
-            </div>
-            <div class="form-group">
-              <label>Packaging</label>
-              <input type="text" name="packaging" placeholder="e.g., Jar, 500g Bag">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Notes</label>
-            <textarea name="notes" rows="2" placeholder="Brand, expiry date, notes"></textarea>
-          </div>
-        `;
-      } 
-      else if (type === 'alcohol') {
-        container.innerHTML = `
-          <div class="form-group">
-            <label>Brand / Item Name</label>
-            <input type="text" name="itemName" required placeholder="e.g., Don Julio 1942, Macallan 12">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Tequila, Single Malt, Gin">
-            </div>
-            <div class="form-group">
-              <label>Sub Category</label>
-              <input type="text" name="subcategory" placeholder="e.g., Añejo, Speyside, London Dry">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Bottle Count</label>
-              <input type="text" name="quantity" placeholder="e.g., 1">
-            </div>
-            <div class="form-group">
-              <label>Volume / Packaging</label>
-              <input type="text" name="packaging" placeholder="e.g., 750ml, 1L Box">
-            </div>
-            <div class="form-group">
-              <label>Status</label>
-              <select name="status">
-                <option value="Sealed">Sealed</option>
-                <option value="Open">Open</option>
-                <option value="Reserve">Reserve</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Tasting Notes & Style</label>
-            <textarea name="notes" rows="2" placeholder="Flavor profile, proof, notes"></textarea>
-          </div>
-        `;
-      } 
-      else if (type === 'recipes') {
-        container.innerHTML = `
-          <div class="form-row">
-            <div class="form-group">
-              <label>Title (English)</label>
-              <input type="text" name="titleEn" required placeholder="e.g., Charred Tomato & Pepper Ezme">
-            </div>
-            <div class="form-group">
-              <label>Title (বাংলা)</label>
-              <input type="text" name="titleBn" placeholder="e.g., এজমে সালাদ">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cuisine Type</label>
-              <input type="text" name="cuisine" placeholder="e.g., Turkish, Middle Eastern, Mexican">
-            </div>
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Dip, BBQ, Main, Cocktail">
-            </div>
-            <div class="form-group">
-              <label>Time</label>
-              <input type="text" name="time" placeholder="e.g., 20 mins">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Key Ingredients (English)</label>
-            <textarea name="ingredientsEn" rows="2" placeholder="Tomatoes, Pepper paste, Pomegranate molasses, Parsley"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Key Ingredients (বাংলা)</label>
-            <textarea name="ingredientsBn" rows="2" placeholder="টমেটো, পেপার পেস্ট, আনারের রস, ধনেপাতা"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Instructions (English)</label>
-            <textarea name="instructionsEn" rows="3" placeholder="Finely mince vegetables, whisk dressing, mix and chill."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Instructions (বাংলা)</label>
-            <textarea name="instructionsBn" rows="3" placeholder="সব উপকরণ কুচি করে কেটে ড্রেসিং মিশিয়ে পরিবেশন করুন।"></textarea>
-          </div>
-        `;
-      }
-    }
-
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-      const submitBtn = document.getElementById('btnSubmit');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Saving...';
-
-      const formData = new FormData(e.target);
-      const payload = { type: document.getElementById('entryType').value };
-      formData.forEach((value, key) => { payload[key] = value; });
-
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        alert("Item saved successfully to your Google Sheet! Please allow 1-2 minutes for Google's public CSV cache to refresh on the site.");
-        closeAddModal();
-        fetchInventory();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to submit item: " + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save to Database';
-      }
-    }
-
-    fetchInventory();
-  </script>
-</body>
-</html>
