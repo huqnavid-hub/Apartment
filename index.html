@@ -6,8 +6,6 @@
   <title>Huq Apartment Dhaka</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- PapaParse for bulletproof CSV parsing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
       --bg: #090d16; --surface: #131c2e; --surface-card: #182238; --surface-hover: #22304e;
@@ -230,24 +228,70 @@
     let currentView = 'kitchen';
     let activeFilter = 'ALL';
 
-    function fetchCSV(url) {
-      return new Promise((resolve) => {
-        Papa.parse(url, {
-          download: true,
-          header: true,
-          skipEmptyLines: 'greedy',
-          transformHeader: h => h.trim(),
-          complete: (results) => resolve(results.data || []),
-          error: (err) => {
-            console.error("PapaParse error for " + url, err);
-            resolve([]);
+    // Native, zero-dependency RFC 4180 CSV parser: handles newlines, quotes, commas cleanly
+    function parseCSV(text) {
+      if (!text) return [];
+      let str = text.replace(/^\uFEFF/, '');
+      const rows = [];
+      let row = [];
+      let col = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < str.length; i++) {
+        const c = str[i];
+        if (inQuotes) {
+          if (c === '"') {
+            if (i + 1 < str.length && str[i + 1] === '"') {
+              col += '"';
+              i++;
+            } else {
+              inQuotes = false;
+            }
+          } else {
+            col += c;
           }
+        } else {
+          if (c === '"') {
+            inQuotes = true;
+          } else if (c === ',') {
+            row.push(col.trim());
+            col = '';
+          } else if (c === '\r') {
+            if (i + 1 < str.length && str[i + 1] === '\n') i++;
+            row.push(col.trim());
+            col = '';
+            if (row.some(val => val !== '')) rows.push(row);
+            row = [];
+          } else if (c === '\n') {
+            row.push(col.trim());
+            col = '';
+            if (row.some(val => val !== '')) rows.push(row);
+            row = [];
+          } else {
+            col += c;
+          }
+        }
+      }
+      if (col || row.length > 0) {
+        row.push(col.trim());
+        if (row.some(val => val !== '')) rows.push(row);
+      }
+      
+      if (rows.length < 2) return [];
+      const headers = rows[0].map(h => h.replace(/^["']|["']$/g, '').trim());
+      
+      return rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, idx) => {
+          if (h) obj[h] = (r[idx] !== undefined ? r[idx] : '').replace(/^["']|["']$/g, '').trim();
         });
+        return obj;
       });
     }
 
-    // Flexible accessor to read columns regardless of casing or extra spaces
+    // Flexible accessor that looks across multiple possible header variations
     function getVal(item, keys) {
+      if (!item) return '';
       for (const k of keys) {
         if (item[k] !== undefined && item[k] !== null && String(item[k]).trim() !== '') {
           return String(item[k]).trim();
@@ -257,27 +301,34 @@
     }
 
     async function fetchInventory() {
-      try {
-        const [kitchenRows, alcoholRows, recipeRows] = await Promise.all([
-          fetchCSV(KITCHEN_CSV_URL),
-          fetchCSV(ALCOHOL_CSV_URL),
-          fetchCSV(RECIPE_CSV_URL)
-        ]);
-
-        appData.kitchen = kitchenRows.filter(r => Object.values(r).some(v => v));
-        appData.alcohol = alcoholRows.filter(r => Object.values(r).some(v => v));
-        appData.recipes = recipeRows.filter(r => Object.values(r).some(v => v));
-
-        document.getElementById('count-kitchen').textContent = appData.kitchen.length;
-        document.getElementById('count-alcohol').textContent = appData.alcohol.length;
-        document.getElementById('count-recipes').textContent = appData.recipes.length;
-
-        renderChips();
-        render();
-      } catch (error) {
-        console.error("Data load error:", error);
-        document.getElementById('mainGrid').innerHTML = `<p class="empty-state">Unable to load data. Please refresh.</p>`;
+      async function loadOne(url) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return [];
+          const text = await res.text();
+          return parseCSV(text);
+        } catch (e) {
+          console.warn("Failed fetching", url, e);
+          return [];
+        }
       }
+
+      const [kitchenRows, alcoholRows, recipeRows] = await Promise.all([
+        loadOne(KITCHEN_CSV_URL),
+        loadOne(ALCOHOL_CSV_URL),
+        loadOne(RECIPE_CSV_URL)
+      ]);
+
+      appData.kitchen = kitchenRows;
+      appData.alcohol = alcoholRows;
+      appData.recipes = recipeRows;
+
+      document.getElementById('count-kitchen').textContent = appData.kitchen.length;
+      document.getElementById('count-alcohol').textContent = appData.alcohol.length;
+      document.getElementById('count-recipes').textContent = appData.recipes.length;
+
+      renderChips();
+      render();
     }
 
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -437,7 +488,7 @@
       grid.innerHTML = html;
     }
 
-    /* Modal Form */
+    /* Modal Form Logic */
     function openAddModal() {
       document.getElementById('entryType').value = currentView;
       switchFormFields();
@@ -588,24 +639,4 @@
       try {
         await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        alert("Item saved successfully to your Google Sheet! Please allow 1-2 minutes for Google's public CSV cache to refresh on the site.");
-        closeAddModal();
-        fetchInventory();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to submit item: " + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save to Database';
-      }
-    }
-
-    fetchInventory();
-  </script>
-</body>
-</html>
+          mode: '
