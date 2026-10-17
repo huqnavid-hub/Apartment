@@ -133,4 +133,479 @@
     @media (max-width: 768px) {
       .sidebar { position: absolute; left: -270px; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.7); }
       .sidebar.open { transform: translateX(270px); }
-      .menu-
+      .menu-toggle { display: block; }
+      .topbar { padding: 0 1rem; }
+      .workspace { padding: 1.25rem 1rem; }
+      .form-row { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      Huq Apartment
+      <span>Dhaka Inventory</span>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-header">Inventory</div>
+      <button class="nav-btn active" onclick="navigate('kitchen', event)">
+        <span>🥫 Kitchen & Pantry</span>
+        <span class="nav-count" id="count-kitchen">0</span>
+      </button>
+      <button class="nav-btn" onclick="navigate('alcohol', event)">
+        <span>🥃 Master Alcohol</span>
+        <span class="nav-count" id="count-alcohol">0</span>
+      </button>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-header">Culinary</div>
+      <button class="nav-btn" onclick="navigate('recipes', event)">
+        <span>📖 Master Recipes</span>
+        <span class="nav-count" id="count-recipes">0</span>
+      </button>
+    </div>
+
+    <button class="btn-add-vault" onclick="openAddModal()">＋ Add Entry</button>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Search across Huq Apartment inventory...">
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" id="pageTitle">Kitchen & Pantry</h1>
+          <div class="page-stats" id="pageStats">Loading data...</div>
+        </div>
+      </div>
+
+      <div class="chips-bar" id="categoryChips"></div>
+      <div class="grid" id="mainGrid"></div>
+    </main>
+  </div>
+
+  <!-- Add Entry Modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-card">
+      <h2 class="modal-title" id="modalHeading">Add New Entry</h2>
+      <form id="addEntryForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label>Target Database</label>
+          <select id="entryType" onchange="switchFormFields()">
+            <option value="kitchen">🥫 Kitchen & Pantry</option>
+            <option value="alcohol">🥃 Master Alcohol</option>
+            <option value="recipes">📖 Master Recipes</option>
+          </select>
+        </div>
+
+        <div id="dynamicFields"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmit">Save to Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const KITCHEN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT836L087viXjJaJOhgbGFsRhPHcRZcR-hKAE0gd7TZPWX9De7MxGrCnvMweyH2SzI69QgUamzouqUY/pub?output=csv";
+    const ALCOHOL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUdypfnDL2H51_65Yik4aTa41OY9CmVlNAR1oZO93f1VfJGAQpWFLrv9fUHhL90O22jnvHlc1dupXa/pub?output=csv";
+    const RECIPE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH-mQWDKyoHQuzr3bY3kA7fqrYJ0qC6CVsMJKUgSyeSaGN_YaIFGGbXGkb3gKnuvw8gtjxgNZ30ARV/pub?output=csv";
+
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIBwcP523moPifQ9mdYfY_nf2EJXzUl0qV8Pz5cgqflT28hA1qhwwqArr4QaMt-oW8nQ/exec";
+
+    let appData = { kitchen: [], alcohol: [], recipes: [] };
+    let currentView = 'kitchen';
+    let activeFilter = 'ALL';
+
+    function fetchCSV(url) {
+      return new Promise((resolve) => {
+        Papa.parse(url, {
+          download: true,
+          header: true,
+          skipEmptyLines: 'greedy',
+          transformHeader: h => h.trim(),
+          complete: (results) => resolve(results.data || []),
+          error: (err) => {
+            console.error("PapaParse error for " + url, err);
+            resolve([]);
+          }
+        });
+      });
+    }
+
+    // Flexible accessor to read columns regardless of casing or extra spaces
+    function getVal(item, keys) {
+      for (const k of keys) {
+        if (item[k] !== undefined && item[k] !== null && String(item[k]).trim() !== '') {
+          return String(item[k]).trim();
+        }
+      }
+      return '';
+    }
+
+    async function fetchInventory() {
+      try {
+        const [kitchenRows, alcoholRows, recipeRows] = await Promise.all([
+          fetchCSV(KITCHEN_CSV_URL),
+          fetchCSV(ALCOHOL_CSV_URL),
+          fetchCSV(RECIPE_CSV_URL)
+        ]);
+
+        appData.kitchen = kitchenRows.filter(r => Object.values(r).some(v => v));
+        appData.alcohol = alcoholRows.filter(r => Object.values(r).some(v => v));
+        appData.recipes = recipeRows.filter(r => Object.values(r).some(v => v));
+
+        document.getElementById('count-kitchen').textContent = appData.kitchen.length;
+        document.getElementById('count-alcohol').textContent = appData.alcohol.length;
+        document.getElementById('count-recipes').textContent = appData.recipes.length;
+
+        renderChips();
+        render();
+      } catch (error) {
+        console.error("Data load error:", error);
+        document.getElementById('mainGrid').innerHTML = `<p class="empty-state">Unable to load data. Please refresh.</p>`;
+      }
+    }
+
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+    
+    function navigate(view, event) {
+      currentView = view;
+      activeFilter = 'ALL';
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      if (event && event.currentTarget) event.currentTarget.classList.add('active');
+      document.getElementById('sidebar').classList.remove('open');
+      
+      const titles = { kitchen: "Kitchen & Pantry", alcohol: "Master Alcohol", recipes: "Master Recipes" };
+      document.getElementById('pageTitle').textContent = titles[view];
+      document.getElementById('globalSearch').value = '';
+      
+      renderChips();
+      render();
+    }
+
+    function renderChips() {
+      const container = document.getElementById('categoryChips');
+      const data = appData[currentView] || [];
+      const categories = new Set();
+
+      data.forEach(item => {
+        const cat = getVal(item, ['Category', 'Cuisine Type', 'Cuisine']);
+        if (cat) categories.add(cat);
+      });
+
+      if (categories.size === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `<div class="chip ${activeFilter === 'ALL' ? 'active' : ''}" onclick="setFilter('ALL')">All Items</div>`;
+      Array.from(categories).sort().forEach(cat => {
+        html += `<div class="chip ${activeFilter === cat ? 'active' : ''}" onclick="setFilter('${cat.replace(/'/g, "\\'")}')">${cat}</div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function setFilter(cat) {
+      activeFilter = cat;
+      renderChips();
+      render();
+    }
+
+    document.getElementById('globalSearch').addEventListener('input', render);
+
+    function render() {
+      const query = document.getElementById('globalSearch').value.toLowerCase();
+      const grid = document.getElementById('mainGrid');
+      const stats = document.getElementById('pageStats');
+      let html = '';
+      
+      const data = appData[currentView] || [];
+      const filtered = data.filter(item => {
+        const itemCat = getVal(item, ['Category', 'Cuisine Type', 'Cuisine']);
+        const matchesFilter = (activeFilter === 'ALL') || (itemCat === activeFilter);
+        const matchesQuery = Object.values(item).join(' ').toLowerCase().includes(query);
+        return matchesFilter && matchesQuery;
+      });
+
+      stats.textContent = `${filtered.length} items found`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">No matching items found.</div>`;
+        return;
+      }
+
+      if (currentView === 'kitchen') {
+        html = filtered.map(item => {
+          const name = getVal(item, ['ItemName', 'Item Name', 'Item']) || 'Unnamed Item';
+          const loc = getVal(item, ['Location']) || 'Stock';
+          const cat = getVal(item, ['Category']);
+          const sub = getVal(item, ['SubCategory', 'Sub-Category']);
+          const qty = getVal(item, ['Quantity']) || '-';
+          const pkg = getVal(item, ['Packaging']);
+          const notes = getVal(item, ['Notes']);
+          return `
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">${name}</div>
+                <div class="badge ${loc.toLowerCase().includes('open') ? 'active' : ''}">${loc}</div>
+              </div>
+              <div class="card-meta">
+                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${qty}</strong> ${pkg ? '(' + pkg + ')' : ''}
+              </div>
+              ${notes ? `<div class="card-notes">${notes}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } 
+      else if (currentView === 'alcohol') {
+        html = filtered.map(item => {
+          const name = getVal(item, ['Brand / Item Name', 'Brand', 'ItemName', 'Item Name']) || 'Unnamed Bottle';
+          const status = getVal(item, ['Status']) || 'Sealed';
+          const cat = getVal(item, ['Category']);
+          const sub = getVal(item, ['SubCategory', 'Sub-Category']);
+          const count = getVal(item, ['Bottle Count', 'Quantity']) || '-';
+          const vol = getVal(item, ['Volume / Packaging', 'Packaging']);
+          const notes = getVal(item, ['Tasting Notes & Style', 'Notes']);
+          return `
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">${name}</div>
+                <div class="badge ${status.toLowerCase() === 'open' ? 'active' : ''}">${status}</div>
+              </div>
+              <div class="card-meta">
+                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
+                Qty: <strong>${count}</strong> ${vol ? '(' + vol + ')' : ''}
+              </div>
+              ${notes ? `<div class="card-notes">${notes}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+      else if (currentView === 'recipes') {
+        html = filtered.map(item => {
+          const titleEn = getVal(item, ['Title (English)', 'Title']) || 'Untitled Recipe';
+          const titleBn = getVal(item, ['Title (বাংলা)', 'Title Bangla']);
+          const cuisine = getVal(item, ['Cuisine Type', 'Cuisine']);
+          const cat = getVal(item, ['Category']);
+          const ingEn = getVal(item, ['Key Ingredients (English)', 'Key Ingredients', 'Ingredients']);
+          const ingBn = getVal(item, ['Key Ingredients (বাংলা)']);
+          const time = getVal(item, ['Time', 'Cook Time']);
+          const instEn = getVal(item, ['Instructions (English)', 'Instructions', 'Steps']);
+          const instBn = getVal(item, ['Instructions (বাংলা)']);
+          return `
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">${titleEn}</div>
+                  ${titleBn ? `<div class="card-subtitle">${titleBn}</div>` : ''}
+                </div>
+                ${time ? `<div class="badge highlight">${time}</div>` : ''}
+              </div>
+              <div class="card-meta">
+                <strong>${cuisine}</strong> ${cat ? '&bull; ' + cat : ''}
+              </div>
+              ${ingEn ? `
+                <div class="card-notes">
+                  <strong>Ingredients:</strong> ${ingEn}${ingBn ? `<div class="card-notes-bn">উপকরণ: ${ingBn}</div>` : ''}
+                </div>` : ''
+              }
+              ${instEn ? `
+                <div class="card-notes" style="margin-top:0.6rem;">
+                  <strong>Steps:</strong> ${instEn}${instBn ? `<div class="card-notes-bn">প্রস্তুত প্রণালী: ${instBn}</div>` : ''}
+                </div>` : ''
+              }
+            </div>
+          `;
+        }).join('');
+      }
+
+      grid.innerHTML = html;
+    }
+
+    /* Modal Form */
+    function openAddModal() {
+      document.getElementById('entryType').value = currentView;
+      switchFormFields();
+      document.getElementById('addModal').classList.add('open');
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').classList.remove('open');
+      document.getElementById('addEntryForm').reset();
+    }
+
+    function switchFormFields() {
+      const type = document.getElementById('entryType').value;
+      const container = document.getElementById('dynamicFields');
+      
+      if (type === 'kitchen') {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" name="itemName" required placeholder="e.g., Sumac, Black Lime Powder">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Spices, Pantry, Sauces">
+            </div>
+            <div class="form-group">
+              <label>Sub Category</label>
+              <input type="text" name="subcategory" placeholder="e.g., Whole Spices, Pastes">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" name="location" placeholder="e.g., Pantry Shelf 2, Fridge">
+            </div>
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="text" name="quantity" placeholder="e.g., 2">
+            </div>
+            <div class="form-group">
+              <label>Packaging</label>
+              <input type="text" name="packaging" placeholder="e.g., Jar, 500g Bag">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" rows="2" placeholder="Brand, expiry date, notes"></textarea>
+          </div>
+        `;
+      } 
+      else if (type === 'alcohol') {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Brand / Item Name</label>
+            <input type="text" name="itemName" required placeholder="e.g., Don Julio 1942, Macallan 12">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Tequila, Single Malt, Gin">
+            </div>
+            <div class="form-group">
+              <label>Sub Category</label>
+              <input type="text" name="subcategory" placeholder="e.g., Añejo, Speyside, London Dry">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bottle Count</label>
+              <input type="text" name="quantity" placeholder="e.g., 1">
+            </div>
+            <div class="form-group">
+              <label>Volume / Packaging</label>
+              <input type="text" name="packaging" placeholder="e.g., 750ml, 1L Box">
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select name="status">
+                <option value="Sealed">Sealed</option>
+                <option value="Open">Open</option>
+                <option value="Reserve">Reserve</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tasting Notes & Style</label>
+            <textarea name="notes" rows="2" placeholder="Flavor profile, proof, notes"></textarea>
+          </div>
+        `;
+      } 
+      else if (type === 'recipes') {
+        container.innerHTML = `
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title (English)</label>
+              <input type="text" name="titleEn" required placeholder="e.g., Charred Tomato & Pepper Ezme">
+            </div>
+            <div class="form-group">
+              <label>Title (বাংলা)</label>
+              <input type="text" name="titleBn" placeholder="e.g., এজমে সালাদ">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cuisine Type</label>
+              <input type="text" name="cuisine" placeholder="e.g., Turkish, Middle Eastern, Mexican">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" name="category" placeholder="e.g., Dip, BBQ, Main, Cocktail">
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="text" name="time" placeholder="e.g., 20 mins">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Key Ingredients (English)</label>
+            <textarea name="ingredientsEn" rows="2" placeholder="Tomatoes, Pepper paste, Pomegranate molasses, Parsley"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Key Ingredients (বাংলা)</label>
+            <textarea name="ingredientsBn" rows="2" placeholder="টমেটো, পেপার পেস্ট, আনারের রস, ধনেপাতা"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Instructions (English)</label>
+            <textarea name="instructionsEn" rows="3" placeholder="Finely mince vegetables, whisk dressing, mix and chill."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Instructions (বাংলা)</label>
+            <textarea name="instructionsBn" rows="3" placeholder="সব উপকরণ কুচি করে কেটে ড্রেসিং মিশিয়ে পরিবেশন করুন।"></textarea>
+          </div>
+        `;
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btnSubmit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      const formData = new FormData(e.target);
+      const payload = { type: document.getElementById('entryType').value };
+      formData.forEach((value, key) => { payload[key] = value; });
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("Item saved successfully to your Google Sheet! Please allow 1-2 minutes for Google's public CSV cache to refresh on the site.");
+        closeAddModal();
+        fetchInventory();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to submit item: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save to Database';
+      }
+    }
+
+    fetchInventory();
+  </script>
+</body>
+</html>
