@@ -50,33 +50,52 @@
     .menu-toggle { display: none; background: transparent; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
     .search-container { flex: 1; max-width: 600px; position: relative; }
     .search-container input {
-      width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: 99px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+      width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem; border-radius: 99px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 0.95rem; outline: none; transition: all 0.2s;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
-    .search-container input:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-container input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .search-icon { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
     
     /* Workspace */
     .workspace { flex: 1; padding: 2rem; overflow-y: auto; }
-    .page-header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; }
-    .page-title { font-size: 1.8rem; font-weight: 700; }
-    .page-stats { font-size: 0.9rem; color: var(--text-muted); }
+    .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+    .page-title { font-size: 1.8rem; font-weight: 700; color: #fff; }
+    .page-stats { font-size: 0.9rem; font-weight: 600; color: var(--accent); background: var(--accent-glow); padding: 0.4rem 0.8rem; border-radius: 20px; }
     
+    /* Grouping Headers */
+    .category-header {
+      font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin: 2rem 0 1rem 0; padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border); display: flex; align-items: center; gap: 0.5rem;
+    }
+    .category-header:first-child { margin-top: 0; }
+    .category-header::before { content: '📁'; font-size: 1.2rem; }
+
     /* Cards Grid */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; }
-    .card-title { font-weight: 600; font-size: 1.05rem; color: #fff; line-height: 1.3; }
-    .card-subtitle { font-size: 0.85rem; color: #34d399; margin-top: 2px; }
-    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 6px; text-transform: uppercase; white-space: nowrap; background: var(--surface-hover); color: var(--text-muted); }
-    .badge.active { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-    .badge.highlight { background: var(--accent-glow); color: var(--accent); }
-    .card-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; }
-    .card-meta strong { color: #e2e8f0; }
-    .card-notes { font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: auto; line-height: 1.4; }
-    .card-notes-bn { font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem; line-height: 1.4; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-color: #475569; }
     
-    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; }
+    .card-title { font-weight: 700; font-size: 1.1rem; color: #fff; line-height: 1.3; }
+    .card-subtitle { font-size: 0.9rem; color: #34d399; margin-top: 4px; font-weight: 500; }
+    
+    /* Badges & Tags */
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 6px; text-transform: uppercase; white-space: nowrap; background: var(--surface-hover); color: var(--text-muted); border: 1px solid transparent; }
+    .badge.active { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2); }
+    .badge.highlight { background: var(--accent-glow); color: var(--accent); }
+    
+    .tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .tag { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 6px; background: rgba(15, 23, 42, 0.5); color: #cbd5e1; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.3rem; }
+    .tag-qty { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2); }
+    .tag-pkg { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); }
+    
+    .card-notes { font-size: 0.85rem; color: #cbd5e1; background: rgba(15, 23, 42, 0.4); padding: 0.75rem 1rem; border-radius: 8px; margin-top: auto; line-height: 1.5; border-left: 3px solid var(--border); }
+    .card-notes strong { color: #fff; }
+    .card-notes-bn { font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
+    
+    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); grid-column: 1 / -1; background: var(--surface); border-radius: 12px; border: 1px dashed var(--border); }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
 
     /* Modal Form */
     .modal-overlay {
@@ -87,456 +106,6 @@
     .modal-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
       width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
-    .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-row { display: flex; gap: 1rem; }
-    .form-row .form-group { flex: 1; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 0.9rem; outline: none;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
-    .btn-secondary { background: var(--surface-hover); color: var(--text); border: none; padding: 0.7rem 1.25rem; border-radius: 8px; cursor: pointer; }
-    .btn-primary { background: var(--accent); color: #0f172a; font-weight: 700; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; }
-
-    @media (max-width: 768px) {
-      .sidebar { position: absolute; left: -260px; height: 100%; box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
-      .sidebar.open { transform: translateX(260px); }
-      .menu-toggle { display: block; }
-      .topbar { padding: 0 1rem; }
-      .workspace { padding: 1.5rem 1rem; }
-      .form-row { flex-direction: column; gap: 0; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
-    <div class="brand">
-      Huq Apartment
-      <span>Dhaka Inventory</span>
-    </div>
-    
-    <div class="nav-section">
-      <div class="nav-header">Inventory</div>
-      <button class="nav-btn active" onclick="navigate('kitchen', event)">🥫 Kitchen & Pantry</button>
-      <button class="nav-btn" onclick="navigate('alcohol', event)">🥃 Master Alcohol</button>
-    </div>
-    
-    <div class="nav-section">
-      <div class="nav-header">Culinary</div>
-      <button class="nav-btn" onclick="navigate('recipes', event)">📖 Master Recipes</button>
-    </div>
-
-    <button class="btn-add-vault" onclick="openAddModal()">＋ Add Entry</button>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <header class="topbar">
-      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-      <div class="search-container">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="globalSearch" placeholder="Search across Huq Apartment inventory...">
-      </div>
-    </header>
-
-    <main class="workspace">
-      <div class="page-header">
-        <h1 class="page-title" id="pageTitle">Kitchen & Pantry</h1>
-        <div class="page-stats" id="pageStats">Loading data...</div>
-      </div>
-      <div class="grid" id="mainGrid"></div>
-    </main>
-  </div>
-
-  <!-- Add Entry Modal -->
-  <div class="modal-overlay" id="addModal">
-    <div class="modal-card">
-      <h2 class="modal-title">Add New Entry</h2>
-      <form id="addEntryForm" onsubmit="handleFormSubmit(event)">
-        <div class="form-group">
-          <label>Target Database</label>
-          <select id="entryType" onchange="switchFormFields()">
-            <option value="kitchen">🥫 Kitchen & Pantry</option>
-            <option value="alcohol">🥃 Master Alcohol</option>
-            <option value="recipes">📖 Master Recipes</option>
-          </select>
-        </div>
-
-        <div id="dynamicFields"></div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
-          <button type="submit" class="btn-primary" id="btnSubmit">Save to Database</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    const KITCHEN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT836L087viXjJaJOhgbGFsRhPHcRZcR-hKAE0gd7TZPWX9De7MxGrCnvMweyH2SzI69QgUamzouqUY/pub?output=csv";
-    const ALCOHOL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUdypfnDL2H51_65Yik4aTa41OY9CmVlNAR1oZO93f1VfJGAQpWFLrv9fUHhL90O22jnvHlc1dupXa/pub?output=csv";
-    const RECIPE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSH-mQWDKyoHQuzr3bY3kA7fqrYJ0qC6CVsMJKUgSyeSaGN_YaIFGGbXGkb3gKnuvw8gtjxgNZ30ARV/pub?output=csv";
-
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIBwcP523moPifQ9mdYfY_nf2EJXzUl0qV8Pz5cgqflT28hA1qhwwqArr4QaMt-oW8nQ/exec";
-
-    let appData = { kitchen: [], alcohol: [], recipes: [] };
-    let currentView = 'kitchen';
-
-    function parseCSV(text) {
-      if (!text) return [];
-      const lines = text.trim().replace(/^\uFEFF/, '').split(/\r?\n/);
-      if (lines.length < 2) return [];
-      
-      const headers = [];
-      let hCur = '', hInside = false;
-      for (let i = 0; i < lines[0].length; i++) {
-        const char = lines[0][i];
-        if (char === '"') { hInside = !hInside; }
-        else if (char === ',' && !hInside) { headers.push(hCur.trim().replace(/^"|"$/g, '')); hCur = ''; }
-        else { hCur += char; }
-      }
-      headers.push(hCur.trim().replace(/^"|"$/g, ''));
-
-      return lines.slice(1).map(line => {
-        const values = [];
-        let cur = '', insideQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const char = line[i], next = line[i+1];
-          if (char === '"' && insideQuotes && next === '"') { cur += '"'; i++; }
-          else if (char === '"') { insideQuotes = !insideQuotes; }
-          else if (char === ',' && !insideQuotes) { values.push(cur.trim()); cur = ''; }
-          else { cur += char; }
-        }
-        values.push(cur.trim());
-        const rowObj = { _vals: values };
-        headers.forEach((h, idx) => {
-          if (h) rowObj[h] = (values[idx] || '').replace(/^"|"$/g, '');
-        });
-        return rowObj;
-      });
-    }
-
-    async function fetchInventory() {
-      try {
-        // Appends a unique timestamp to force Safari to always fetch fresh data without caching
-        const antiCache = '&_ts=' + Date.now();
-        const fetchOpts = { cache: 'no-store' };
-
-        const [kitchenRes, alcoholRes, recipeRes] = await Promise.all([
-          fetch(KITCHEN_CSV_URL + antiCache, fetchOpts).catch(() => null),
-          fetch(ALCOHOL_CSV_URL + antiCache, fetchOpts).catch(() => null),
-          fetch(RECIPE_CSV_URL + antiCache, fetchOpts).catch(() => null)
-        ]);
-        
-        if (kitchenRes && kitchenRes.ok) appData.kitchen = parseCSV(await kitchenRes.text());
-        if (alcoholRes && alcoholRes.ok) appData.alcohol = parseCSV(await alcoholRes.text());
-        if (recipeRes && recipeRes.ok) appData.recipes = parseCSV(await recipeRes.text());
-        
-        render();
-      } catch (error) {
-        console.error("Data fetch error:", error);
-        document.getElementById('mainGrid').innerHTML = `<p class="empty-state">Unable to load live data.</p>`;
-      }
-    }
-
-    function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
-    
-    function navigate(view, event) {
-      currentView = view;
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      if (event && event.currentTarget) event.currentTarget.classList.add('active');
-      document.getElementById('sidebar').classList.remove('open');
-      
-      const titles = { kitchen: "Kitchen & Pantry", alcohol: "Master Alcohol", recipes: "Master Recipes" };
-      document.getElementById('pageTitle').textContent = titles[view] || 'Inventory';
-      document.getElementById('globalSearch').value = '';
-      render();
-    }
-
-    document.getElementById('globalSearch').addEventListener('input', render);
-
-    function render() {
-      const query = document.getElementById('globalSearch').value.toLowerCase();
-      const grid = document.getElementById('mainGrid');
-      const stats = document.getElementById('pageStats');
-      let html = '';
-      
-      const data = appData[currentView] || [];
-      const filtered = data.filter(item => {
-        return Object.values(item).join(' ').toLowerCase().includes(query);
-      });
-
-      stats.textContent = `${filtered.length} items found`;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-state">No matching items found.</div>`;
-        return;
-      }
-
-      if (currentView === 'kitchen') {
-        html = filtered.map(item => {
-          const name = item.ItemName || item['Item Name'] || (item._vals && item._vals[3]) || 'Unnamed Item';
-          const loc = item.Location || (item._vals && item._vals[0]) || 'Stock';
-          const cat = item.Category || (item._vals && item._vals[1]) || '';
-          const sub = item.SubCategory || item['Sub-Category'] || (item._vals && item._vals[2]) || '';
-          const qty = item.Quantity || (item._vals && item._vals[4]) || '-';
-          const pkg = item.Packaging || (item._vals && item._vals[5]) || '';
-          const notes = item.Notes || (item._vals && item._vals[6]) || '';
-          return `
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">${name}</div>
-                <div class="badge ${loc.toLowerCase().includes('open') ? 'active' : ''}">${loc}</div>
-              </div>
-              <div class="card-meta">
-                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${qty}</strong> ${pkg ? '(' + pkg + ')' : ''}
-              </div>
-              ${notes ? `<div class="card-notes">${notes}</div>` : ''}
-            </div>
-          `;
-        }).join('');
-      } 
-      else if (currentView === 'alcohol') {
-        html = filtered.map(item => {
-          const name = item['Brand / Item Name'] || item.ItemName || (item._vals && item._vals[0]) || 'Unnamed Bottle';
-          const status = item.Status || (item._vals && item._vals[5]) || 'Sealed';
-          const cat = item.Category || (item._vals && item._vals[1]) || '';
-          const sub = item.SubCategory || (item._vals && item._vals[2]) || '';
-          const count = item['Bottle Count'] || item.Quantity || (item._vals && item._vals[3]) || '-';
-          const vol = item['Volume / Packaging'] || item.Packaging || (item._vals && item._vals[4]) || '';
-          const notes = item['Tasting Notes & Style'] || item.Notes || (item._vals && item._vals[6]) || '';
-          return `
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">${name}</div>
-                <div class="badge ${status.toLowerCase() === 'open' ? 'active' : ''}">${status}</div>
-              </div>
-              <div class="card-meta">
-                <strong>${cat}</strong> ${sub ? '&bull; ' + sub : ''}<br>
-                Qty: <strong>${count}</strong> ${vol ? '(' + vol + ')' : ''}
-              </div>
-              ${notes ? `<div class="card-notes">${notes}</div>` : ''}
-            </div>
-          `;
-        }).join('');
-      }
-      else if (currentView === 'recipes') {
-        html = filtered.map(item => {
-          const titleEn = item['Title (English)'] || item.Title || (item._vals && item._vals[0]) || 'Recipe';
-          const titleBn = item['Title (বাংলা)'] || (item._vals && item._vals[1]) || '';
-          const cuisine = item['Cuisine Type'] || (item._vals && item._vals[2]) || '';
-          const cat = item.Category || (item._vals && item._vals[3]) || '';
-          const ingEn = item['Key Ingredients (English)'] || item['Key Ingredients'] || item.Ingredients || (item._vals && item._vals[4]) || '';
-          const ingBn = item['Key Ingredients (বাংলা)'] || (item._vals && item._vals[5]) || '';
-          const time = item.Time || (item._vals && item._vals[6]) || '';
-          const instEn = item['Instructions (English)'] || item.Instructions || item.Steps || (item._vals && item._vals[7]) || '';
-          const instBn = item['Instructions (বাংলা)'] || (item._vals && item._vals[8]) || '';
-          return `
-            <div class="card">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">${titleEn}</div>
-                  ${titleBn ? `<div class="card-subtitle">${titleBn}</div>` : ''}
-                </div>
-                ${time ? `<div class="badge highlight">${time}</div>` : ''}
-              </div>
-              <div class="card-meta">
-                <strong>${cuisine}</strong> ${cat ? '&bull; ' + cat : ''}
-              </div>
-              ${ingEn ? `
-                <div class="card-notes">
-                  <strong>Ingredients:</strong> ${ingEn}${ingBn ? `<div class="card-notes-bn">উপকরণ: ${ingBn}</div>` : ''}
-                </div>` : ''
-              }
-              ${instEn ? `
-                <div class="card-notes" style="margin-top:0.5rem;">
-                  <strong>Steps:</strong> ${instEn}${instBn ? `<div class="card-notes-bn">প্রস্তুত প্রণালী: ${instBn}</div>` : ''}
-                </div>` : ''
-              }
-            </div>
-          `;
-        }).join('');
-      }
-
-      grid.innerHTML = html;
-    }
-
-    /* Modal Form */
-    function openAddModal() {
-      document.getElementById('entryType').value = currentView;
-      switchFormFields();
-      document.getElementById('addModal').classList.add('open');
-    }
-
-    function closeAddModal() {
-      document.getElementById('addModal').classList.remove('open');
-      document.getElementById('addEntryForm').reset();
-    }
-
-    function switchFormFields() {
-      const type = document.getElementById('entryType').value;
-      const container = document.getElementById('dynamicFields');
-      
-      if (type === 'kitchen') {
-        container.innerHTML = `
-          <div class="form-group">
-            <label>Item Name</label>
-            <input type="text" name="itemName" required placeholder="e.g., Sumac, Black Lime Powder">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Spices, Pantry, Sauces">
-            </div>
-            <div class="form-group">
-              <label>Sub Category</label>
-              <input type="text" name="subcategory" placeholder="e.g., Whole Spices, Pastes">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Location</label>
-              <input type="text" name="location" placeholder="e.g., Pantry Shelf 2, Fridge">
-            </div>
-            <div class="form-group">
-              <label>Quantity</label>
-              <input type="text" name="quantity" placeholder="e.g., 2">
-            </div>
-            <div class="form-group">
-              <label>Packaging</label>
-              <input type="text" name="packaging" placeholder="e.g., Jar, 500g Bag">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Notes</label>
-            <textarea name="notes" rows="2" placeholder="Brand, expiry date, notes"></textarea>
-          </div>
-        `;
-      } 
-      else if (type === 'alcohol') {
-        container.innerHTML = `
-          <div class="form-group">
-            <label>Brand / Item Name</label>
-            <input type="text" name="itemName" required placeholder="e.g., Don Julio 1942, Macallan 12">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Tequila, Single Malt, Gin">
-            </div>
-            <div class="form-group">
-              <label>Sub Category</label>
-              <input type="text" name="subcategory" placeholder="e.g., Añejo, Speyside, London Dry">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Bottle Count</label>
-              <input type="text" name="quantity" placeholder="e.g., 1">
-            </div>
-            <div class="form-group">
-              <label>Volume / Packaging</label>
-              <input type="text" name="packaging" placeholder="e.g., 750ml, 1L Box">
-            </div>
-            <div class="form-group">
-              <label>Status</label>
-              <select name="status">
-                <option value="Sealed">Sealed</option>
-                <option value="Open">Open</option>
-                <option value="Reserve">Reserve</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Tasting Notes & Style</label>
-            <textarea name="notes" rows="2" placeholder="Flavor profile, proof, notes"></textarea>
-          </div>
-        `;
-      } 
-      else if (type === 'recipes') {
-        container.innerHTML = `
-          <div class="form-row">
-            <div class="form-group">
-              <label>Title (English)</label>
-              <input type="text" name="titleEn" required placeholder="e.g., Charred Tomato & Pepper Ezme">
-            </div>
-            <div class="form-group">
-              <label>Title (বাংলা)</label>
-              <input type="text" name="titleBn" placeholder="e.g., এজমে সালাদ">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cuisine Type</label>
-              <input type="text" name="cuisine" placeholder="e.g., Turkish, Middle Eastern, Mexican">
-            </div>
-            <div class="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Dip, BBQ, Main, Cocktail">
-            </div>
-            <div class="form-group">
-              <label>Time</label>
-              <input type="text" name="time" placeholder="e.g., 20 mins">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Key Ingredients (English)</label>
-            <textarea name="ingredientsEn" rows="2" placeholder="Tomatoes, Pepper paste, Pomegranate molasses, Parsley"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Key Ingredients (বাংলা)</label>
-            <textarea name="ingredientsBn" rows="2" placeholder="টমেটো, পেপার পেস্ট, আনারের রস, ধনেপাতা"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Instructions (English)</label>
-            <textarea name="instructionsEn" rows="3" placeholder="Finely mince vegetables, whisk dressing, mix and chill."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Instructions (বাংলা)</label>
-            <textarea name="instructionsBn" rows="3" placeholder="সব উপকরণ কুচি করে কেটে ড্রেসিং মিশিয়ে পরিবেশন করুন।"></textarea>
-          </div>
-        `;
-      }
-    }
-
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-      const submitBtn = document.getElementById('btnSubmit');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Saving...';
-
-      const formData = new FormData(e.target);
-      const payload = { type: document.getElementById('entryType').value };
-      formData.forEach((value, key) => { payload[key] = value; });
-
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        alert("Item saved successfully to your Google Sheet! Please allow 1-2 minutes for Google's public CSV cache to refresh on the site.");
-        closeAddModal();
-        fetchInventory();
-      } catch (err) {
-        console.error(err);
-        alert("Failed to submit item: " + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save to Database';
-      }
-    }
-
-    fetchInventory();
-  </script>
-</body>
-</html>
+    .modal-title { font-size: 1.3rem; font-
